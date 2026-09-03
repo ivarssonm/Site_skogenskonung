@@ -23,22 +23,28 @@ Gamla adresser som `/{slug}/` och `/{år}/{månad}/` är bevarade.
 
 ## Utveckling
 
+Öppna terminalen i projektmappen först:
+
 ```bash
+cd /sökväg/till/Site_skogenskonung
+node --version
 npm install
-npm run dev
+npx astro dev
 ```
+
+Öppna sedan adressen som Astro visar, vanligtvis `http://localhost:4321/`. `npx astro dev` använder Astro-versionen som är installerad i projektet.
 
 Bygg:
 
 ```bash
-npm run build
-npm run preview
+npx astro build
+npx astro preview
 ```
 
 Återexportera från WordPress (om den gamla sajten fortfarande är uppe):
 
 ```bash
-npm run export:wp
+node scripts/export_wordpress.py
 ```
 
 ## Nya inlägg
@@ -46,7 +52,7 @@ npm run export:wp
 Se [MARTIN.md](MARTIN.md). Kortversion:
 
 ```bash
-npm run nytt-inlagg -- "Rubriken här"
+node scripts/new-post.mjs "Rubriken här"
 ```
 
 ## Publicera

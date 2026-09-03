@@ -4,11 +4,11 @@ Sajten är inte WordPress längre. Du skriver i en vanlig textfil. När sidan by
 
 ## Enklaste sättet
 
-1. Öppna en terminal i projektmappen.
+1. Öppna en terminal i projektmappen, alltså mappen `Site_skogenskonung`.
 2. Kör:
 
 ```bash
-npm run nytt-inlagg -- "Bruse i höstskogen"
+node scripts/new-post.mjs "Bruse i höstskogen"
 ```
 
 3. Öppna filen som skapades, till exempel `src/content/posts/bruse-i-hostskogen.md`.
@@ -21,7 +21,13 @@ Här kommer en bild från passet.
 ![Bruse i pass](/media/uploads/new/bruse.jpg)
 ```
 
-6. Spara. Kör `npm run dev` och öppna adressen som skriptet skrev ut.
+6. Spara. Kontrollera att du står i projektmappen och kör:
+
+```bash
+npx astro dev
+```
+
+Öppna sedan `http://localhost:4321/`.
 
 
 ## Vad betyder fälten högst upp?
@@ -52,4 +58,4 @@ Gamla kommentarer ligger kvar under inläggen, märkta *Migrerad*. Nya kommentar
 
 ## Publicera
 
-När du är nöjd: bygg sajten (`npm run build`) och lägg upp den, eller be Eric koppla GitHub så att varje sparad ändring går ut automatiskt.
+När du är nöjd: bygg sajten (`npx astro build`) och lägg upp den, eller be Eric koppla GitHub så att varje sparad ändring går ut automatiskt.
