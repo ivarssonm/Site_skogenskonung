@@ -1,0 +1,20 @@
+---
+interface Props {
+  images: string[];
+  title?: string;
+}
+
+const { images, title } = Astro.props;
+---
+
+{
+  images.length > 0 && (
+    <div class="gallery-grid" role="list" aria-label={title ?? "Bildgalleri"}>
+      {images.map((src) => (
+        <figure class="gallery-item" role="listitem">
+          <img src={src} alt="" loading="lazy" />
+        </figure>
+      ))}
+    </div>
+  )
+}

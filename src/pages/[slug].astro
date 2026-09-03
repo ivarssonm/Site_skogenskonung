@@ -1,0 +1,103 @@
+---
+import Base from "../layouts/Base.astro";
+import LegacyComments from "../components/LegacyComments.astro";
+import GalleryGrid from "../components/GalleryGrid.astro";
+import { allPages, allPosts, firstImage, plainText, readingMinutes } from "../lib/content";
+import { formatDate } from "../lib/dates";
+import { categoryLabel } from "../site";
+import { render } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await allPosts();
+  const pages = await allPages();
+  const used = new Set<string>();
+  const paths = [];
+
+  const reserved = new Set(["fotoalbum", "om-mig", "arkiv", "sok", "kategori", "category", "admin"]);
+
+  // Pages win on slug collisions (e.g. om-mig).
+  for (const page of pages) {
+    if (reserved.has(page.data.slug)) continue;
+    used.add(page.data.slug);
+    paths.push({
+      params: { slug: page.data.slug },
+      props: { kind: "page" as const, page, post: undefined },
+    });
+  }
+  for (const post of posts) {
+    if (used.has(post.data.slug)) continue;
+    paths.push({
+      params: { slug: post.data.slug },
+      props: { kind: "post" as const, post, page: undefined },
+    });
+  }
+  return paths;
+}
+
+const { kind, post, page } = Astro.props;
+const entry = kind === "post" ? post! : page!;
+const { Content } = await render(entry);
+const html = entry.body ?? "";
+const image = ("cover" in entry.data ? entry.data.cover : undefined) || firstImage(html);
+const description =
+  ("excerpt" in entry.data && entry.data.excerpt) || plainText(html).slice(0, 180);
+---
+
+<Base title={entry.data.title} description={description} image={image}>
+  {
+    kind === "post" && post && (
+      <article class="article wrap">
+        <header class="article-head">
+          <p class="card-meta">
+            <time datetime={post.data.date}>{formatDate(post.data.date)}</time>
+            {post.data.categories[0] && (
+              <>
+                {" · "}
+                <a href={`/kategori/${post.data.categories[0]}/`}>
+                  {categoryLabel(post.data.categories[0])}
+                </a>
+              </>
+            )}
+            {" · "}
+            {readingMinutes(html)} min läsning
+          </p>
+          <h1 set:html={post.data.title} />
+        </header>
+        <div class="prose">
+          {
+            post.data.cover && !html.includes(post.data.cover) && (
+              <figure class="featured-figure">
+                <img src={post.data.cover} alt="" />
+              </figure>
+            )
+          }
+          <Content />
+        </div>
+        <LegacyComments comments={post.data.comments} />
+      </article>
+    )
+  }
+
+  {
+    kind === "page" && page && (
+      <article class="article wrap">
+        <header class="page-hero">
+          <p class="kicker">{page.data.kind === "gallery" ? "Fotoalbum" : "Sida"}</p>
+          <h1 set:html={page.data.title} />
+        </header>
+        {
+          page.data.kind === "gallery" && page.data.gallery.length > 0 ? (
+            <GalleryGrid
+              images={page.data.gallery.filter((src) => /\.(jpe?g|png|gif|webp|avif)$/i.test(src))}
+              title={page.data.title}
+            />
+          ) : (
+            <div class="prose">
+              <Content />
+            </div>
+          )
+        }
+      </article>
+    )
+  }
+</Base>

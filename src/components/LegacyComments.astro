@@ -1,0 +1,39 @@
+---
+interface Comment {
+  id: number;
+  author: string;
+  date: string;
+  content: string;
+  html?: string;
+  legacy?: boolean;
+}
+
+interface Props {
+  comments: Comment[];
+}
+
+const { comments } = Astro.props;
+import { formatDate } from "../lib/dates";
+---
+
+{
+  comments.length > 0 && (
+    <section class="comments">
+      <h2>Kommentarer</h2>
+      <p class="muted">
+        Bevarade från den gamla sidan. Nya kommentarer går inte att skriva.
+      </p>
+      {comments.map((comment) => (
+        <article class="comment" id={`comment-${comment.id}`}>
+          <div class="comment-meta">
+            <strong>{comment.author}</strong>
+            {" · "}
+            <time datetime={comment.date}>{formatDate(comment.date)}</time>
+            <span class="badge">Migrerad</span>
+          </div>
+          {comment.html ? <div set:html={comment.html} /> : <p>{comment.content}</p>}
+        </article>
+      ))}
+    </section>
+  )
+}

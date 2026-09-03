@@ -1,0 +1,28 @@
+---
+import { categoryLabel } from "../site";
+import { formatDate } from "../lib/dates";
+import { firstImage, type Post } from "../lib/content";
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const html = post.body ?? "";
+const image = post.data.cover || firstImage(html);
+const category = post.data.categories[0];
+---
+
+<a class="card" href={`/${post.data.slug}/`}>
+  <div class="card-media">
+    {image && <img src={image} alt="" loading="lazy" />}
+  </div>
+  <div class="card-body">
+    <div class="card-meta">
+      {formatDate(post.data.date)}
+      {category && <> · {categoryLabel(category)}</>}
+    </div>
+    <h3 set:html={post.data.title} />
+    {post.data.excerpt && <p>{post.data.excerpt}</p>}
+  </div>
+</a>

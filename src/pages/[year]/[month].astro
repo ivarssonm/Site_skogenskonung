@@ -1,0 +1,45 @@
+---
+import Base from "../../layouts/Base.astro";
+import PostCard from "../../components/PostCard.astro";
+import { allPosts } from "../../lib/content";
+import { formatMonth, monthSlug } from "../../lib/dates";
+
+export async function getStaticPaths() {
+  const posts = await allPosts();
+  const keys = new Map<string, { year: number; month: number }>();
+  for (const post of posts) {
+    const d = new Date(post.data.date);
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    keys.set(`${year}-${month}`, { year, month });
+  }
+  return [...keys.values()].map(({ year, month }) => ({
+    params: { year: String(year), month: monthSlug(month) },
+    props: {
+      year,
+      month,
+      posts: posts.filter((post) => {
+        const d = new Date(post.data.date);
+        return d.getFullYear() === year && d.getMonth() + 1 === month;
+      }),
+    },
+  }));
+}
+
+const { year, month, posts } = Astro.props;
+const label = formatMonth(year, month);
+---
+
+<Base title={label} description={`Inlägg från ${label}.`}>
+  <section class="wrap page-hero">
+    <p class="kicker">
+      <a href={`/arkiv/${year}/`}>{year}</a>
+    </p>
+    <h1>{label}</h1>
+  </section>
+  <section class="section">
+    <div class="wrap grid cards">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+  </section>
+</Base>

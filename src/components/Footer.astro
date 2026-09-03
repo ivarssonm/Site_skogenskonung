@@ -1,0 +1,32 @@
+---
+import { site } from "../site";
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <a class="footer-brand" href="/" aria-label={site.name}>
+      <img class="footer-mark" src="/brand/mark.png" alt="Skogens konung" width="1024" height="1024" />
+    </a>
+    <div>
+      <h2>{site.name}</h2>
+      <p>{site.tagline}</p>
+      <p class="muted">Av {site.author}. Inlägg sedan 2009, nu som statisk sida.</p>
+    </div>
+    <div>
+      <h3>På sidan</h3>
+      <p>
+        <a href="/fotoalbum/">Fotoalbum</a><br />
+        <a href="/arkiv/">Arkiv</a><br />
+        <a href="/om-mig/">Om mig</a><br />
+        <a href="/sok/">Sök</a>
+      </p>
+    </div>
+    <div>
+      <h3>Bevarat</h3>
+      <p>
+        All text, alla bilder och de gamla kommentarerna följde med från den tidigare WordPress-sajten.
+        Nya kommentarer tas inte emot.
+      </p>
+    </div>
+  </div>
+</footer>

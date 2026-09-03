@@ -1,0 +1,55 @@
+---
+import Base from "../layouts/Base.astro";
+import PostCard from "../components/PostCard.astro";
+import { site } from "../site";
+import { allPosts, firstImage } from "../lib/content";
+import { formatDate } from "../lib/dates";
+
+const posts = await allPosts();
+const latest = posts[0];
+const rest = posts.slice(1, 13);
+const latestImage = latest ? latest.data.cover || firstImage(latest.body ?? "") : undefined;
+const heroImage = "/brand/hero.jpg";
+---
+
+<Base image={heroImage}>
+  <section class="hero" style={`--hero: url('${heroImage}')`}>
+    <div class="wrap hero-inner">
+      <p class="kicker">Sedan 2009</p>
+      <h1>{site.name}</h1>
+      <p>{site.tagline}</p>
+    </div>
+  </section>
+
+  {
+    latest && (
+      <section class="section">
+        <div class="wrap">
+          <a class="featured" href={`/${latest.data.slug}/`}>
+            <div
+              class="featured-media"
+              style={latestImage ? `background-image:url('${latestImage}')` : undefined}
+            />
+            <div class="featured-body">
+              <p class="kicker">Senaste inlägget · {formatDate(latest.data.date)}</p>
+              <h2 set:html={latest.data.title} />
+              {latest.data.excerpt && <p>{latest.data.excerpt}</p>}
+            </div>
+          </a>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Ur skogen</h2>
+        <a class="muted" href="/arkiv/">Alla {posts.length} inlägg</a>
+      </div>
+      <div class="grid cards">
+        {rest.map((post) => <PostCard post={post} />)}
+      </div>
+    </div>
+  </section>
+</Base>

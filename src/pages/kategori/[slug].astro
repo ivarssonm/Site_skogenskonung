@@ -1,0 +1,32 @@
+---
+import Base from "../../layouts/Base.astro";
+import PostCard from "../../components/PostCard.astro";
+import { allPosts } from "../../lib/content";
+import { categoryLabel, site } from "../../site";
+
+export async function getStaticPaths() {
+  const posts = await allPosts();
+  const slugs = [...new Set(posts.flatMap((post) => post.data.categories))];
+  return slugs.map((slug) => ({
+    params: { slug },
+    props: { slug, posts: posts.filter((post) => post.data.categories.includes(slug)) },
+  }));
+}
+
+const { slug, posts } = Astro.props;
+const label = categoryLabel(slug);
+const blurb = site.categories[slug]?.blurb;
+---
+
+<Base title={label} description={blurb ?? `Inlägg i ${label}.`}>
+  <section class="wrap page-hero">
+    <p class="kicker">Kategori</p>
+    <h1>{label}</h1>
+    {blurb && <p class="muted">{blurb}</p>}
+  </section>
+  <section class="section">
+    <div class="wrap grid cards">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+  </section>
+</Base>

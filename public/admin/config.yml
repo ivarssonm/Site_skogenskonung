@@ -1,0 +1,52 @@
+backend:
+  name: git-gateway
+  branch: main
+
+locale: sv
+
+media_folder: public/media/uploads/new
+public_folder: /media/uploads/new
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: posts
+    label: Inlägg
+    label_singular: Inlägg
+    folder: src/content/posts
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: title, label: Rubrik, widget: string }
+      - { name: slug, label: Slug (i adressen), widget: string, hint: "t.ex. hostjakt-2026" }
+      - { name: date, label: Datum, widget: datetime }
+      - { name: author, label: Författare, widget: string, default: Martin Ivarsson }
+      - {
+          name: categories,
+          label: Kategorier,
+          widget: select,
+          multiple: true,
+          options: ["jakt-jakt", "friluftsliv-jakt", "okategoriserade"],
+          default: ["okategoriserade"],
+        }
+      - { name: excerpt, label: Utdrag, widget: text, required: false }
+      - { name: cover, label: Omslagsbild, widget: image, required: false }
+      - { name: draft, label: Utkast, widget: boolean, default: false }
+      - { name: body, label: Text, widget: markdown }
+  - name: pages
+    label: Sidor
+    folder: src/content/pages
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: title, label: Rubrik, widget: string }
+      - { name: slug, label: Slug, widget: string }
+      - { name: kind, label: Typ, widget: select, options: ["page", "gallery"], default: page }
+      - { name: gallery, label: Galleribilder, widget: list, field: { name: image, widget: image }, required: false }
+      - { name: body, label: Text, widget: markdown }

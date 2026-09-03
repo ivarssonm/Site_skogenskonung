@@ -1,0 +1,38 @@
+---
+import Base from "../layouts/Base.astro";
+import { allPages, firstImage } from "../lib/content";
+
+const pages = await allPages();
+const albums = pages
+  .filter((page) => page.data.kind === "gallery" && page.data.slug !== "fotoalbum")
+  .sort((a, b) => a.data.title.localeCompare(b.data.title, "sv"));
+---
+
+<Base title="Fotoalbum" description="Bildgallerier från gården, jakten och projekten.">
+  <section class="wrap page-hero">
+    <p class="kicker">Bilder</p>
+    <h1>Fotoalbum</h1>
+    <p><strong>Projekt</strong></p>
+  </section>
+  <section class="section">
+    <div class="wrap grid cards">
+      {
+        albums.map((album) => {
+          const images = album.data.gallery.filter((src) =>
+            /\.(jpe?g|png|gif|webp|avif)$/i.test(src),
+          );
+          const cover = images[0] || firstImage(album.body ?? "");
+          return (
+            <a class="card" href={`/${album.data.slug}/`}>
+              <div class="card-media">{cover && <img src={cover} alt="" loading="lazy" />}</div>
+              <div class="card-body">
+                <div class="card-meta">{images.length || ""} bilder</div>
+                <h3>{album.data.title}</h3>
+              </div>
+            </a>
+          );
+        })
+      }
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,75 @@
+---
+import Base from "../layouts/Base.astro";
+import { getCollection, render } from "astro:content";
+import { allPosts } from "../lib/content";
+import { site } from "../site";
+
+const pages = await getCollection("pages", ({ data }) => data.slug === "om-mig" && !data.draft);
+const page = pages[0];
+if (!page) throw new Error("Sidan Om mig saknas i innehållet.");
+const { Content } = await render(page);
+
+const posts = await allPosts();
+const years = posts.map((post) => new Date(post.data.date).getFullYear());
+const firstYear = Math.min(...years);
+const lastYear = Math.max(...years);
+const jakt = posts.filter((post) => post.data.categories.includes("jakt-jakt")).length;
+const friluft = posts.filter((post) => post.data.categories.includes("friluftsliv-jakt")).length;
+
+---
+
+<Base title="Om mig" description="Martin Ivarsson — jakt, friluftsliv och livet på landet." image="/brand/martin.jpg">
+  <section class="profile">
+    <div class="wrap profile-grid">
+      <div class="profile-photo-wrap">
+        <img class="profile-photo" src="/brand/martin.jpg" alt="Martin Ivarsson på Kebnekaise" width="720" height="720" />
+        <span class="profile-badge">Sedan 1980</span>
+      </div>
+      <div class="profile-copy">
+        <p class="kicker">Om mig</p>
+        <h1>Martin Ivarsson</h1>
+        <p class="profile-lead">{site.tagline}</p>
+        <p class="profile-note">
+          Jobbar med teknik, bor i hus på landet strax utanför stan och håller fast vid det viktigaste:
+          <strong>tax ska man ha.</strong> Drygt 40 års erfarenhet av livet — resten får stå som han
+          skrev det, här under.
+        </p>
+        <p class="profile-trail" aria-label="Några saker Martin håller av">
+          <span>Teknik</span>
+          <span>Landet</span>
+          <span>Jakt</span>
+          <span>Skog</span>
+          <span>Tax</span>
+        </p>
+        <div class="profile-stats" role="list">
+          <div role="listitem">
+            <strong>{posts.length}</strong>
+            <span>inlägg</span>
+          </div>
+          <div role="listitem">
+            <strong>{firstYear}–{lastYear}</strong>
+            <span>år på sidan</span>
+          </div>
+          <div role="listitem">
+            <strong>{jakt}</strong>
+            <span>jakt</span>
+          </div>
+          <div role="listitem">
+            <strong>{friluft}</strong>
+            <span>friluftsliv</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <article class="article wrap about-legacy">
+    <header class="page-hero">
+      <p class="kicker">Som det stod då</p>
+      <h2>Originaltexten</h2>
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Base>

@@ -1,0 +1,32 @@
+---
+import Base from "../../layouts/Base.astro";
+import PostCard from "../../components/PostCard.astro";
+import { allPosts } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const posts = await allPosts();
+  const years = [...new Set(posts.map((post) => new Date(post.data.date).getFullYear()))];
+  return years.map((year) => ({
+    params: { year: String(year) },
+    props: {
+      year,
+      posts: posts.filter((post) => new Date(post.data.date).getFullYear() === year),
+    },
+  }));
+}
+
+const { year, posts } = Astro.props;
+---
+
+<Base title={String(year)} description={`Inlägg från ${year}.`}>
+  <section class="wrap page-hero">
+    <p class="kicker">Arkiv</p>
+    <h1>{year}</h1>
+    <p class="muted">{posts.length} inlägg</p>
+  </section>
+  <section class="section">
+    <div class="wrap grid cards">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+  </section>
+</Base>

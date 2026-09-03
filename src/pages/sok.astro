@@ -1,0 +1,67 @@
+---
+import Base from "../layouts/Base.astro";
+import { allPosts, plainText } from "../lib/content";
+import { formatDate } from "../lib/dates";
+
+const posts = await allPosts();
+const index = posts.map((post) => ({
+  title: post.data.title,
+  slug: post.data.slug,
+  date: formatDate(post.data.date),
+  excerpt: post.data.excerpt || plainText(post.body ?? "").slice(0, 180),
+  text: `${post.data.title} ${post.data.excerpt} ${plainText(post.body ?? "")}`.toLowerCase(),
+}));
+---
+
+<Base title="Sök" description="Sök bland inläggen på Skogenskonung.">
+  <section class="wrap page-hero">
+    <p class="kicker">Hitta tillbaka</p>
+    <h1>Sök</h1>
+    <form class="search" id="sokform">
+      <input type="search" name="q" id="q" placeholder="Till exempel Bruse, älg eller Kebnekaise" />
+      <button type="submit">Sök</button>
+    </form>
+  </section>
+  <section class="section">
+    <div class="wrap">
+      <p class="muted" id="sokstatus"></p>
+      <ul id="sokresultat"></ul>
+    </div>
+  </section>
+</Base>
+
+<script define:vars={{ index }}>
+  const form = document.getElementById("sokform");
+  const input = document.getElementById("q");
+  const status = document.getElementById("sokstatus");
+  const list = document.getElementById("sokresultat");
+
+  function search(q) {
+    const query = (q || "").trim().toLowerCase();
+    list.innerHTML = "";
+    if (query.length < 2) {
+      status.textContent = "Skriv minst två bokstäver.";
+      return;
+    }
+    const hits = index.filter((item) => item.text.includes(query)).slice(0, 40);
+    status.textContent = hits.length ? `${hits.length} träffar` : "Inga träffar.";
+    for (const hit of hits) {
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="/${hit.slug}/">${hit.title}</a> <span class="muted">· ${hit.date}</span><br><span class="muted">${hit.excerpt}</span>`;
+      list.appendChild(li);
+    }
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const q = input.value;
+    history.replaceState(null, "", `?q=${encodeURIComponent(q)}`);
+    search(q);
+  });
+
+  const initial = new URLSearchParams(location.search).get("q");
+  if (initial && input) {
+    input.value = initial;
+    search(initial);
+  }
+</script>

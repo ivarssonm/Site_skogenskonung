@@ -1,0 +1,28 @@
+---
+import { site } from "../site";
+import Mark from "./Mark.astro";
+
+const path = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">
+      <Mark />
+      <span>
+        <span class="brand-name">{site.name}</span>
+        <span class="brand-tag">{site.tagline}</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="Huvudmeny">
+      {
+        site.nav.map((item) => (
+          <a href={item.href} aria-current={path === item.href ? "page" : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+      <a href="/sok/">Sök</a>
+    </nav>
+  </div>
+</header>

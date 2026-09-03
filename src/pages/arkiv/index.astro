@@ -1,0 +1,56 @@
+---
+import Base from "../../layouts/Base.astro";
+import { allPosts } from "../../lib/content";
+import { formatDate, formatMonth, monthSlug } from "../../lib/dates";
+
+const posts = await allPosts();
+const byYear = new Map<number, typeof posts>();
+for (const post of posts) {
+  const year = new Date(post.data.date).getFullYear();
+  byYear.set(year, [...(byYear.get(year) ?? []), post]);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+
+<Base title="Arkiv" description="Alla inlägg på Skogenskonung, år för år.">
+  <section class="wrap page-hero">
+    <p class="kicker">{posts.length} inlägg</p>
+    <h1>Arkiv</h1>
+  </section>
+  <section class="section">
+    <div class="wrap">
+      <div class="year-list" style="margin-bottom: 2rem">
+        {years.map((year) => <a href={`/arkiv/${year}/`}>{year}</a>)}
+      </div>
+      {
+        years.map((year) => {
+          const yearPosts = byYear.get(year) ?? [];
+          const months = [...new Set(yearPosts.map((p) => new Date(p.data.date).getMonth() + 1))];
+          return (
+            <section style="margin-bottom: 2.4rem">
+              <div class="section-head">
+                <h2>{year}</h2>
+                <a class="muted" href={`/arkiv/${year}/`}>
+                  {yearPosts.length} inlägg
+                </a>
+              </div>
+              <div class="year-list">
+                {months.map((month) => (
+                  <a href={`/${year}/${monthSlug(month)}/`}>{formatMonth(year, month)}</a>
+                ))}
+              </div>
+              <ul>
+                {yearPosts.slice(0, 8).map((post) => (
+                  <li>
+                    <a href={`/${post.data.slug}/`} set:html={post.data.title} />
+                    <span class="muted"> · {formatDate(post.data.date)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })
+      }
+    </div>
+  </section>
+</Base>

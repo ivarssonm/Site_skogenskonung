@@ -1,0 +1,20 @@
+---
+import { allPosts } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const posts = await allPosts();
+  const slugs = new Set(posts.flatMap((post) => post.data.categories));
+  const aliases = [
+    ...slugs,
+    "jakt/jakt-jakt",
+    "jakt/friluftsliv-jakt",
+    "friluftsliv",
+    "okategoriserade",
+  ];
+  return [...new Set(aliases)].map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const last = slug?.split("/").filter(Boolean).at(-1);
+return Astro.redirect(`/kategori/${last}/`, 301);
+---
